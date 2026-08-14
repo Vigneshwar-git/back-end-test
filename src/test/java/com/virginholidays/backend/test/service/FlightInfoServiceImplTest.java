@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Geoff Perks
  */
+
 @ExtendWith(MockitoExtension.class)
 class FlightInfoServiceImplTest {
 
