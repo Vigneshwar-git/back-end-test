@@ -2,10 +2,11 @@ package com.virginholidays.backend.test.resource;
 
 import com.virginholidays.backend.test.api.Flight;
 import com.virginholidays.backend.test.service.FlightInfoService;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-import javax.validation.constraints.NotEmpty;
+
 import static org.springframework.http.CacheControl.noCache;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author Geoff Perks
@@ -43,7 +46,9 @@ public class FlightInfoResource {
     @RequestMapping(method = RequestMethod.GET, path = "/{date}/results")
     public CompletionStage<ResponseEntity<?>> getResults(@PathVariable("date") @NotEmpty String date) {
 
-        return flightInfoService.findFlightByDate(LocalDate.now()).thenApply(maybeResults -> {
+        LocalDate parsedDate = LocalDate.parse(date);
+
+        return flightInfoService.findFlightByDate(parsedDate).thenApply(maybeResults -> {
 
             // no results, no content
             if (maybeResults.isEmpty()) {
