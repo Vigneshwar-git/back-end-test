@@ -13,7 +13,7 @@ boilerplate function, it must be clearly commented and attributed to the origina
 2) The flight data cannot be changed, and must be loaded from the CSV file, so it can easily be replaced with another file.
 3) You must include any unit tests you think are appropriate.
 4) You are not allowed to add any additional dependencies to the project - make use of what's been provided.
-5) Identify intentional gaps in the code by looking for `//FIXME - applicant to complete` and provide either solutions or improvements.
+5) Identify intentional gaps in the code by looking for ` - applicant to complete` and provide either solutions or improvements.
 
 ## What it should do
 The application should allow the user to select or input any date, of any year, resulting in the display of flights on

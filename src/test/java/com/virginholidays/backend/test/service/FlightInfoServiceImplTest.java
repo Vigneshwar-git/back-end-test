@@ -31,7 +31,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FlightInfoServiceImplTest {
 
-    // FIXME - applicant to complete
     @Mock
     private FlightInfoRepository flightInfoRepository;
 

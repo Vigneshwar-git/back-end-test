@@ -38,8 +38,6 @@ public class FlightInfoServiceImpl implements FlightInfoService {
 
         DayOfWeek dayOfWeek = outboundDate.getDayOfWeek();
 
-        System.out.printf(flightInfoRepository.findAll().toString());
-
         return flightInfoRepository.findAll().thenApply(optionalFlights -> optionalFlights.map(flights ->
                 flights.stream()
                         .filter(flight -> flight.days().contains(dayOfWeek))
