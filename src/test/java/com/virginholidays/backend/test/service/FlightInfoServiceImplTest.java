@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FlightInfoServiceImplTest {
 
-    // FIXME - applicant to complete
     @Mock
     private FlightInfoRepository flightInfoRepository;
 
@@ -44,20 +44,27 @@ class FlightInfoServiceImplTest {
     }
 
     @Test
-    public void testFindFlightByDate_ShouldReturnOnlyFlightsMatchingDayOfWeek() throws ExecutionException, InterruptedException {
+    public void testFindFlightByDate_ShouldReturnOnlyFlightsMatchingDayOfWeekInChronologicalOrder() throws ExecutionException, InterruptedException {
         // Arrange
-
-        String inputDateStr = "2026-08-14";
+        String inputDateStr = "2026-08-14"; // This is a Friday
         LocalDate outboundDate = LocalDate.parse(inputDateStr);
-        // Mock flight 1: Operates on Friday (Should match)
-        Flight matchingFlight = mock(Flight.class);
-        when(matchingFlight.days()).thenReturn(List.of(DayOfWeek.FRIDAY));
 
-        // Mock flight 2: Operates on Monday (Should be filtered out)
+        // Mock flight 1: Later flight on Friday (Should match, but appear second)
+        Flight lateFlight = mock(Flight.class);
+        when(lateFlight.days()).thenReturn(List.of(DayOfWeek.FRIDAY));
+        when(lateFlight.departureTime()).thenReturn(LocalTime.of(18, 30)); // 18:30
+
+        // Mock flight 2: Earlier flight on Friday (Should match, and appear first)
+        Flight earlyFlight = mock(Flight.class);
+        when(earlyFlight.days()).thenReturn(List.of(DayOfWeek.FRIDAY));
+        when(earlyFlight.departureTime()).thenReturn(LocalTime.of(8, 15)); // 08:15
+
+        // Mock flight 3: Operates on Monday (Should be filtered out entirely)
         Flight nonMatchingFlight = mock(Flight.class);
         when(nonMatchingFlight.days()).thenReturn(List.of(DayOfWeek.MONDAY));
 
-        List<Flight> allFlights = List.of(matchingFlight, nonMatchingFlight);
+        // Put them in the repository out of order (late flight first)
+        List<Flight> allFlights = List.of(lateFlight, earlyFlight, nonMatchingFlight);
         CompletableFuture<Optional<List<Flight>>> repositoryResponse =
                 CompletableFuture.completedFuture(Optional.of(allFlights));
 
@@ -72,10 +79,15 @@ class FlightInfoServiceImplTest {
         assertThat(maybeFilteredFlights.isPresent(), equalTo(true));
 
         List<Flight> filteredFlights = maybeFilteredFlights.get();
-        assertThat(filteredFlights, hasSize(1));
-        assertThat(filteredFlights.get(0), equalTo(matchingFlight));
 
-        verify(flightInfoRepository, times(2)).findAll(); // Twice due to System.out.printf logging line
+        // Assert size (excluding the Monday flight)
+        assertThat(filteredFlights, hasSize(2));
+
+        // Chronological Assertions
+        assertThat(filteredFlights.get(0), equalTo(earlyFlight)); // 08:15 comes first
+        assertThat(filteredFlights.get(1), equalTo(lateFlight));  // 18:30 comes second
+
+        verify(flightInfoRepository, times(1)).findAll();
     }
 
     @Test
@@ -96,6 +108,6 @@ class FlightInfoServiceImplTest {
         assertThat(maybeFilteredFlights, notNullValue());
         assertThat(maybeFilteredFlights.isPresent(), equalTo(false));
 
-        verify(flightInfoRepository, times(2)).findAll();
+        verify(flightInfoRepository, times(1)).findAll();
     }
 }

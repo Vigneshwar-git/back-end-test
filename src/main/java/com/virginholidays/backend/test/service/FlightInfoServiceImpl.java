@@ -5,6 +5,7 @@ import com.virginholidays.backend.test.repository.FlightInfoRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
@@ -34,17 +35,14 @@ public class FlightInfoServiceImpl implements FlightInfoService {
     @Override
     public CompletionStage<Optional<List<Flight>>> findFlightByDate(LocalDate outboundDate) {
 
-        // FIXME - applicant to complete
 
         DayOfWeek dayOfWeek = outboundDate.getDayOfWeek();
-
-        System.out.printf(flightInfoRepository.findAll().toString());
 
         return flightInfoRepository.findAll().thenApply(optionalFlights -> optionalFlights.map(flights ->
                 flights.stream()
                         .filter(flight -> flight.days().contains(dayOfWeek))
+                        .sorted(Comparator.comparing(Flight::departureTime)) // Chronological sort
                         .collect(Collectors.toList())
         ));
-
     }
 }
