@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FlightInfoResourceTest {
 
-    // FIXME - applicant to complete.
     @Mock
     private FlightInfoService flightInfoService;
 
@@ -102,9 +100,7 @@ class FlightInfoResourceTest {
         String invalidDateStr = "14-08-2026"; // Non ISO-8601 format
 
         // Act & Assert
-        assertThrows(DateTimeParseException.class, () -> {
-            flightInfoResource.getResults(invalidDateStr);
-        });
+        assertThrows(DateTimeParseException.class, () -> flightInfoResource.getResults(invalidDateStr));
 
         // Verify that the downstream service was never called due to the parsing crash
         verifyNoInteractions(flightInfoService);
